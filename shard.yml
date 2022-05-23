@@ -1,0 +1,31 @@
+name: wallet
+version: 0.1.0
+
+authors:
+  - Giorgi Kavrelishvili <giorgi.kavrelishvili@pm.me>
+
+targets:
+  wallet:
+    main: src/application.cr
+
+dependencies:
+  piranha:
+    github: grkek/piranha
+    branch: master
+
+  google:
+    github: PlaceOS/google
+
+  awscr-s3:
+    github: taylorfinnell/awscr-s3
+
+  grip:
+    github: grip-framework/grip
+
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+
+crystal: 1.0.0
+
+license: MIT
