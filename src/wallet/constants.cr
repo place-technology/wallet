@@ -15,6 +15,8 @@ module Wallet
     AWS_SECRET = ENV["AWS_SECRET"]
     AWS_BUCKET = ENV["AWS_BUCKET"]
 
+    SECRET = ENV["SECRET"]
+
     protected def self.base64(key : String) : String
       raise ArgumentError.new("Base64-encoded ENV #{key} is empty") unless ENV[key]?.presence
       value = String.new(Base64.decode(ENV[key]))

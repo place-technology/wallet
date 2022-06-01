@@ -1,5 +1,5 @@
 module WalletWeb
-  module Errors
+  module Exceptions
     class NotFound < Grip::Controllers::Exception
       def call(context : Context) : Context
         context

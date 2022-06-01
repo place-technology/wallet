@@ -11,9 +11,15 @@ require "./wallet_web/**"
 
 class Application < Grip::Application
   def routes
-    error 404, WalletWeb::Errors::NotFound
+    error 404, WalletWeb::Exceptions::NotFound
+
+    pipeline :api, [
+      WalletWeb::Middleware::Authorization.new,
+    ]
 
     scope "/api" do
+      pipe_through :api
+
       post "/passcard", WalletWeb::Controllers::PasscardController
     end
   end

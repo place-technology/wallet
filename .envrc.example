@@ -13,5 +13,7 @@ export AWS_KEY=
 export AWS_SECRET=
 export AWS_BUCKET=
 
+export SECRET=
+
 export HOST=0.0.0.0
 export PORT=1234
