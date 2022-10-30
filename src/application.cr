@@ -20,7 +20,7 @@ class Application < Grip::Application
     ]
 
     scope "/api" do
-     # pipe_through :api
+      pipe_through :api
 
       post "/passcard", WalletWeb::Controllers::PasscardController
     end
