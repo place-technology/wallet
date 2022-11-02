@@ -5,15 +5,21 @@ module WalletWeb
         serial_number = UUID.random.to_s
         event = Wallet::Models::Event.from_json(context.fetch_json_params.to_json)
 
-        apple_pass_url = apple_pass(event, serial_number)
-        google_pass_url = google_pass(event, serial_number)
+        icon = File.tempfile(serial_number)
+        logo = File.tempfile(serial_number)
+
+        icon.write(Base64.decode(event.image.icon.split(",").last))
+        logo.write(Base64.decode(event.image.logo.split(",").last))
+
+        apple_pass_url = apple_pass(event, serial_number, icon, logo)
+        google_pass_url = google_pass(event, serial_number, logo)
 
         context
           .put_status(201)
           .json({"applePassUrl" => apple_pass_url, "googlePassUrl" => google_pass_url})
       end
 
-      private def apple_pass(event : Wallet::Models::Event, serial_number : String) : String
+      private def apple_pass(event : Wallet::Models::Event, serial_number : String, icon : File, logo : File) : String
         metadata = JSON::PullParser.new(%(
           {
             "formatVersion" : 1,
@@ -55,8 +61,8 @@ module WalletWeb
 
         manifest = Piranha::Manifest.new(passbook)
 
-        manifest.add_file("icon.png", File.read(event.image.icon))
-        manifest.add_file("logo.png", File.read(event.image.logo))
+        manifest.add_file("icon.png", icon.rewind.gets_to_end)
+        manifest.add_file("logo.png", logo.rewind.gets_to_end)
 
         stream = Piranha::Stream.new(passbook, manifest)
 
@@ -86,7 +92,7 @@ module WalletWeb
         url.for(:get)
       end
 
-      private def google_pass(event : Wallet::Models::Event, serial_number : String) : String
+      private def google_pass(event : Wallet::Models::Event, serial_number : String, logo : File) : String
         auth = Google::Auth.new(
           issuer: Wallet::Constants::GOOGLE_CLIENT_EMAIL,
           signing_key: Wallet::Constants::GOOGLE_PRIVATE_KEY,
@@ -98,9 +104,7 @@ module WalletWeb
         client = Awscr::S3::Client.new(Wallet::Constants::AWS_REGION, Wallet::Constants::AWS_KEY, Wallet::Constants::AWS_SECRET)
         uploader = Awscr::S3::FileUploader.new(client)
 
-        File.open(event.image.logo) do |file|
-          uploader.upload(Wallet::Constants::AWS_BUCKET, [serial_number, "png"].join("."), file)
-        end
+        uploader.upload(Wallet::Constants::AWS_BUCKET, [serial_number, "png"].join("."), logo.rewind)
 
         options = Awscr::S3::Presigned::Url::Options.new(
           aws_access_key: Wallet::Constants::AWS_KEY,

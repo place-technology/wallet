@@ -10,8 +10,10 @@ require "./wallet/**"
 require "./wallet_web/**"
 
 class Application < Grip::Application
-  def routes
-    error 404, WalletWeb::Exceptions::NotFound
+  def initialize
+    super(environment: "production", serve_static: false)
+
+    exception Grip::Exceptions::NotFound, WalletWeb::Exceptions::NotFound
 
     pipeline :api, [
       WalletWeb::Middleware::Authorization.new,

@@ -14,8 +14,8 @@ Start the application and request with a client on the route `/api/passbook` usi
 {
     "name": "An Event",
     "image": {
-        "icon": "----REDACTED BASE64----",
-        "logo": "----REDACTED BASE64----"
+        "icon": "----PNG BASE64----",
+        "logo": "----PNG BASE64----"
     },
     "ticketHolder": {
         "firstName": "John",
